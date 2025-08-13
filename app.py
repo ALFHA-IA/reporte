@@ -8,12 +8,29 @@ from flask import render_template
 
 # --- CONFIGURACIÓN DE LA BASE DE DATOS ---
 # Reemplaza los valores de 'user', 'password' y 'database' según tu configuración.
-DB_CONFIG = {
-    'user': 'root',
-    'password': '',
-    'host': 'localhost',
-    'database': 'reporte'
-}
+# --- CONFIGURACIÓN DE LA BASE DE DATOS ---
+import os
+from urllib.parse import urlparse
+
+# Analiza la URL de la base de datos de Render
+db_url = os.environ.get('DATABASE_URL')
+if db_url:
+    url = urlparse(db_url)
+    DB_CONFIG = {
+        'user': url.username,
+        'password': url.password,
+        'host': url.hostname,
+        'database': url.path[1:],
+        'port': url.port
+    }
+else:
+    # Configuración local de fallback (solo para desarrollo)
+    DB_CONFIG = {
+        'user': 'root',
+        'password': '',
+        'host': 'localhost',
+        'database': 'reporte'
+    }
 
 # --- FUNCIONES DE GESTIÓN (CRUD) ---
 def get_db_connection():
@@ -750,3 +767,4 @@ def delete_venta():
 # Iniciar la aplicación
 if __name__ == '__main__':
     app.run(debug=True)
+
